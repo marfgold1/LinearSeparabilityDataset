@@ -20,6 +20,8 @@ class TestConvexHullLibrary(unittest.TestCase):
         Returns:
             bool: True if both list match the condition.
         """
+        if len(l1) != len(l2):
+            self.fail(f'Length of list is different: {len(l1)} vs {len(l2)}')
         for i in range(len(l1)):
             valid = False
             for j in range(len(l2)):

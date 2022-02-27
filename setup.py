@@ -10,7 +10,8 @@ setup(
         'using Decrease and Conquer strategy.',
     ]),
     url='https://github.com/marfgold1/stima-tucil2',
-    packages=find_packages(),
+    package_dir={"": "src"},
+    packages=find_packages(where='src'),
     include_package_data=True,
     zip_safe=False,
     install_requires=[

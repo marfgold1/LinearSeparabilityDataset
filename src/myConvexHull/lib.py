@@ -81,7 +81,7 @@ class ConvexHull(object):
             #    in the line until the max point.
             newline: Tuple[LineIndex, LineIndex] = (
                 (line[0], pmax),
-                (line[1], pmax),
+                (pmax, line[1]),
             )
             # 2.1. Get the points of both line (remember that the
             #      new line from above is just the indexes).
@@ -94,23 +94,21 @@ class ConvexHull(object):
             #    outside the first line or the second line.
             dt_split: List[List[PointIndex], List[PointIndex]] = [[], []]
             for p in dt:
-                # First line is in the left side, so the point outside this
-                # must be in the left side too, which has determinant of > 0
+                # First line is vector (p1,pmax), so the point outside this
+                # must be in the left side, which has determinant of > 0
                 if det(pnewline[0], self.points[p]) > 0:
                     dt_split[0].append(p)
-                # Second line is in the right side, so the point outside this
-                # must be in the right side too, which has determinant of < 0
-                elif det(pnewline[1], self.points[p]) < 0:
+                # Second line is vector (pmax,p2), so the point outside this
+                # must be in the left side (relative to vector direction) too,
+                # which has determinant of > 0
+                elif det(pnewline[1], self.points[p]) > 0:
                     dt_split[1].append(p)
             # COMBINE & CONQUER
             # 4. Recursive call
             # 4.1 Check for points outside the first line
             self.__dnc_convexHull(dt_split[0], newline[0])
             # 4.2 Check for points outside the second line.
-            #     Reverse the order of the line points because we have
-            #     to keep side convention (if not reversed, left will
-            #     be right and vice versa).
-            self.__dnc_convexHull(dt_split[1], newline[1][::-1])
+            self.__dnc_convexHull(dt_split[1], newline[1])
     
     def __convexHull(self):
         """The first step before recursive DnC algo.
@@ -122,12 +120,12 @@ class ConvexHull(object):
         #    it doesn't have any convex hull, skip.
         # 2. If there is only 2 points, then the hull
         #    is just the line between them.
-        if (len(dt) == 2):
+        if len(dt) == 2:
             self.vertices = dt
             self.simplices = [(dt[0], dt[1])]
         # If there are more than 2 points,
         # then we need to check for some things
-        else:
+        elif len(dt) > 2:
             # Sort the points ascending by their x and y coordinate
             dt.sort(key=lambda x: self.points[x])
             # Get the line that start from minimum point
